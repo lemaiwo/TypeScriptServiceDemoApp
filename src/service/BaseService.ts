@@ -19,13 +19,6 @@ type response<T> = {
     data: T,
     response: unknown
 };
-type crudFunctions = {
-    get: <T>(params?: parameters<T>) => Promise<response<T>>;
-    post: <T>(data: T, params?: parameters<T>) => Promise<response<T>>;
-    put: <T, R>(data: R, params?: parameters<T>) => Promise<response<T>>;
-    delete: <T>(params?: parameters<T>) => Promise<response<T>>;
-};
-
 /**
  * @namespace be.wl.TypeScriptServiceDemoApp.service
  */
@@ -43,9 +36,9 @@ export default class BaseService extends Object {
     public getModel(): ODataModel {
         return this.model;
     }
-    public odata(url: string): crudFunctions {
+    public odata(url: string) {
         const core = {
-            ajax: <T, R>(type: odataMethods, url: string, data: R, parameters: parameters<T>): Promise<response<T>> => {
+            ajax: <T>(type: odataMethods, url: string, parameters: parameters<T>, data?: T): Promise<response<T>> => {
                 const promise = new Promise<response<T>>((resolve, reject) => {
                     let params: parameters<T>={};
                     if (parameters) {
@@ -71,10 +64,10 @@ export default class BaseService extends Object {
             }
         };
         return {
-            get: <T>(params?: parameters<T>): Promise<response<T>> => core.ajax('read', url, null, params),
-            post: <T>(data: T, params?: parameters<T>): Promise<response<T>> => core.ajax('create', url, data, params),
-            put: <T, R>(data: R, params?: parameters<T>): Promise<response<T>> => core.ajax('update', url, data, params),
-            delete: <T>(params?: parameters<T>): Promise<response<T>> => core.ajax('remove', url, null, params)
+            get: <T>(params?: parameters<T>): Promise<response<T>> => core.ajax('read', url, params),
+            post: <T>(data: T, params?: parameters<T>): Promise<response<T>> => core.ajax('create', url, params, data),
+            put: <T>(data: T, params?: parameters<T>): Promise<response<T>> => core.ajax('update', url, params, data),
+            delete: <T>(params?: parameters<T>): Promise<response<T>> => core.ajax('remove', url, params)
         };
     }
 }

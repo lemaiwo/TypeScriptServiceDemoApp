@@ -51,7 +51,7 @@ export type SuppliersEntitySet = { results: Array<SuppliersEntity> };
         });
         return this.odata(supplierPath).get<SuppliersEntity>();
     }
-    public async geSupplierNextID(){
+    public async getSupplierNextID(){
         var mParameters = {
             sorters:[new Sorter("ID",true)],
             urlParameters:"$top=1"

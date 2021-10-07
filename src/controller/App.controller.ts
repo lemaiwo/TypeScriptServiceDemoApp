@@ -1,6 +1,7 @@
 import Log from "sap/base/Log";
 import MessageBox from "sap/m/MessageBox";
 import MessageToast from "sap/m/MessageToast";
+import Event from "sap/ui/base/Event";
 import Controller from "sap/ui/core/mvc/Controller";
 import cursorPos from "sap/ui/dom/jquery/cursorPos";
 import Filter from "sap/ui/model/Filter";
@@ -8,7 +9,7 @@ import FilterOperator from "sap/ui/model/FilterOperator";
 import JSONModel from "sap/ui/model/json/JSONModel";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import AppComponent from "../Component";
-import NorthwindService from "../service/NorthwindService";
+import NorthwindService, { SuppliersEntity } from "../service/NorthwindService";
 
 /**
  * @namespace be.wl.TypeScriptServiceDemoApp.controller
@@ -18,13 +19,14 @@ export default class AppController extends Controller {
 	private northwindService: NorthwindService;
 
 	public onInit(): void {
-
 		var oViewModel = new JSONModel({
 			progress: 10
 		});
 		this.getView().setModel(oViewModel, "view");
 		// apply content density mode to root view
 		this.getView().addStyleClass((this.getOwnerComponent() as AppComponent).getContentDensityClass());
+
+
 		this.northwindService = new NorthwindService((this.getOwnerComponent().getModel() as ODataModel));
 		this.runActions();
 	}
@@ -54,8 +56,35 @@ export default class AppController extends Controller {
 			Log.error("This should never have happened");
 		}
 	}
-
-	public sayHello(): void {
-		MessageBox.show("Hello World!");
+	public async generateNewSupplier(event:Event){
+		const model = (this.getView().getModel("view") as JSONModel);
+		let newSupplier:SuppliersEntity = {
+			ID:0,
+			Name: "Test" + new Date().getTime(),
+			Concurrency:1,
+			Address: {
+				Street: "TestStreet",
+				City: "TestCity",
+				State: "TestState",
+				ZipCode: "TestZip",
+				Country: "Belgium"
+			}
+		};
+		try {
+			model.setProperty("/progress", 20);
+			newSupplier.ID = await this.northwindService.getSupplierNextID();
+			model.setProperty("/progress", 40);
+			const response = await this.northwindService.createSupplier(newSupplier);
+			model.setProperty("/progress", 60);
+			MessageToast.show("Suppliers created!");
+		} catch (error) {
+			MessageToast.show("Error when creating Suppliers!");
+		}
+		const response = await this.northwindService.getSuppliers();
+		model.setProperty("/progress", 80);
+		this.getView().setModel(new JSONModel({
+			Suppliers: response.data.results
+		}), "nw");
+		model.setProperty("/progress", 100);
 	}
 }
