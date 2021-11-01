@@ -1,9 +1,7 @@
+import BaseController from "./BaseController";
 import Log from "sap/base/Log";
-import MessageBox from "sap/m/MessageBox";
 import MessageToast from "sap/m/MessageToast";
 import Event from "sap/ui/base/Event";
-import Controller from "sap/ui/core/mvc/Controller";
-import cursorPos from "sap/ui/dom/jquery/cursorPos";
 import Filter from "sap/ui/model/Filter";
 import FilterOperator from "sap/ui/model/FilterOperator";
 import JSONModel from "sap/ui/model/json/JSONModel";
@@ -14,7 +12,7 @@ import NorthwindService, { SuppliersEntity } from "../service/NorthwindService";
 /**
  * @namespace be.wl.TypeScriptServiceDemoApp.controller
  */
-export default class AppController extends Controller {
+export default class AppController extends BaseController {
 
 	private northwindService: NorthwindService;
 
