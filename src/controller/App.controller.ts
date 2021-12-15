@@ -6,7 +6,6 @@ import Filter from "sap/ui/model/Filter";
 import FilterOperator from "sap/ui/model/FilterOperator";
 import JSONModel from "sap/ui/model/json/JSONModel";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
-import AppComponent from "../Component";
 import NorthwindService, { SuppliersEntity } from "../service/NorthwindService";
 
 /**
@@ -17,16 +16,16 @@ export default class AppController extends BaseController {
 	private northwindService: NorthwindService;
 
 	public onInit(): void {
-		var oViewModel = new JSONModel({
+		const oViewModel = new JSONModel({
 			progress: 10
 		});
 		this.getView().setModel(oViewModel, "view");
 		// apply content density mode to root view
-		this.getView().addStyleClass((this.getOwnerComponent() as AppComponent).getContentDensityClass());
+		this.getView().addStyleClass(this.getOwnerComponent().getContentDensityClass());
 
 
 		this.northwindService = new NorthwindService((this.getOwnerComponent().getModel() as ODataModel));
-		this.runActions();
+		void this.runActions();
 	}
 
 	public async runActions(): Promise<void> {
@@ -43,7 +42,7 @@ export default class AppController extends BaseController {
 			}
 			const suppliers = await this.northwindService.getSuppliersWithFilter(filters);
 			model.setProperty("/progress", 70);
-			MessageToast.show("Suppliers in Redmond:" + suppliers.data.results.length);
+			MessageToast.show(`Suppliers in Redmond: ${suppliers.data.results.length}`);
 
 			const response = await this.northwindService.getSuppliers();
 			model.setProperty("/progress", 100);
@@ -54,11 +53,11 @@ export default class AppController extends BaseController {
 			Log.error("This should never have happened");
 		}
 	}
-	public async generateNewSupplier(event:Event){
+	public async generateNewSupplier(event:Event): Promise<void> {
 		const model = (this.getView().getModel("view") as JSONModel);
-		let newSupplier:SuppliersEntity = {
+		const newSupplier: SuppliersEntity = {
 			ID:0,
-			Name: "Test" + new Date().getTime(),
+			Name: `Test ${new Date().getTime()}`,
 			Concurrency:1,
 			Address: {
 				Street: "TestStreet",
@@ -74,7 +73,7 @@ export default class AppController extends BaseController {
 			model.setProperty("/progress", 40);
 			const response = await this.northwindService.createSupplier(newSupplier);
 			model.setProperty("/progress", 60);
-			MessageToast.show("Suppliers created!");
+			MessageToast.show(`Supplier ${response.data.Name} created!`);
 		} catch (error) {
 			MessageToast.show("Error when creating Suppliers!");
 		}

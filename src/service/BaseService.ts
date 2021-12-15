@@ -15,7 +15,7 @@ type parameters<T> = {
     groupId?: string;
     updateAggregatedMessages?: boolean;
 };
-type response<T> = {
+export type response<T> = {
     data: T,
     response: unknown
 };
@@ -40,7 +40,7 @@ export default class BaseService extends Object {
         const core = {
             ajax: <T>(type: odataMethods, url: string, parameters: parameters<T>, data?: T): Promise<response<T>> => {
                 const promise = new Promise<response<T>>((resolve, reject) => {
-                    let params: parameters<T>={};
+                    let params: parameters<T> = {};
                     if (parameters) {
                         params = parameters;
                     }
@@ -54,10 +54,10 @@ export default class BaseService extends Object {
                     params.error = function (error: unknown) {
                         reject(error);
                     };
-                    if(data){
-                        this.model[type](url,data,params);
-                    }else{
-                        this.model[type](url,params);
+                    if (data) {
+                        this.model[type](url, data, params);
+                    } else {
+                        this.model[type](url, params);
                     }
                 });
                 return promise;
