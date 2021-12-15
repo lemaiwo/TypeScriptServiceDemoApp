@@ -5,17 +5,28 @@ import UIComponent from "sap/ui/core/UIComponent";
 import Model from "sap/ui/model/Model";
 import ResourceModel from "sap/ui/model/resource/ResourceModel";
 import ResourceBundle from "sap/base/i18n/ResourceBundle";
+import AppComponent from "../Component";
 /**
  * @namespace be.wl.TypeScriptServiceDemoApp.controller
  */
-export default class BaseController extends Controller {
+export default abstract class BaseController extends Controller {
+
+	/**
+	 * Convenience method for accessing the component of the controller's view.
+	 * @public
+	 * @returns {be.wl.TypeScriptServiceDemoApp.Component} the component of the controller's view
+	 */
+	public getOwnerComponent(): AppComponent {
+        return (super.getOwnerComponent() as AppComponent);
+    }
+
 	/**
 	 * Convenience method for accessing the router in every controller of the application.
 	 * @public
 	 * @returns {sap.ui.core.routing.Router} the router for this component
 	 */
 	public getRouter(): Router {
-		return (this.getOwnerComponent() as UIComponent).getRouter();
+		return this.getOwnerComponent().getRouter();
 	}
 
 	/**
@@ -42,10 +53,10 @@ export default class BaseController extends Controller {
 	/**
 	 * Convenience method for getting the resource bundle.
 	 * @public
-	 * @returns {sap.ui.model.resource.ResourceModel} the resourceModel of the component
+	 * @returns {sap.ui.model.resource.ResourceModel|Promise<sap.ui.model.resource.ResourceModel>} the resource bundle or a Promise resolving with it
 	 */
-	public getResourceBundle(): ResourceBundle {
-		return (((this.getOwnerComponent() as UIComponent).getModel("i18n") as ResourceModel).getResourceBundle() as ResourceBundle);
+	public getResourceBundle(): ResourceBundle | Promise<ResourceBundle> {
+		return (this.getOwnerComponent().getModel("i18n") as ResourceModel).getResourceBundle();
 	}
 
 	/**
